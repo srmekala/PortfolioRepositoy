@@ -1,35 +1,41 @@
 package portfolio;
 
+/**
+ * @author swathi
+ */
+
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Random;
 
 public class PortfolioSimulator {
-    private PortfolioType portfolioType;
+    private PortfolioProp pp;
     private int capital;
     private int numYears;
     private double inflationRate;
     private int numSimulations;
-    private double meanReturn;
-    private double riskStdDev;
     private double[] result;
+    static double bestcasePercentile = 90;
+    static double worstcasePercentile = 10;
 
-    public PortfolioSimulator(PortfolioType pt, double mr, double r, int capt, int yrs, double ir, int numSims) {
-        portfolioType = pt;
-        meanReturn = mr;
-        riskStdDev = r;
+	public PortfolioSimulator(PortfolioProp pt, int capt, int yrs, double ir, int numSims) {
+        pp = pt;
         capital = capt;
         numYears = yrs;
         inflationRate = ir;
         numSimulations = numSims;
     }
 
-    public PortfolioType getPortfolioType() {
-        return portfolioType;
-    }
+    public PortfolioProp getPp() {
+		return pp;
+	}
 
-    public int getCapital() {
+	public void setPp(PortfolioProp pp) {
+		this.pp = pp;
+	}
+
+	public int getCapital() {
 		return capital;
 	}
 
@@ -69,49 +75,63 @@ public class PortfolioSimulator {
 		this.result = result;
 	}
 
-	public void setPortfolioType(PortfolioType portfolioType) {
-        this.portfolioType = portfolioType;
-    }
+	public static double getBestcasePercentile() {
+		return bestcasePercentile;
+	}
 
-    public double getMeanReturn() {
-        return meanReturn;
-    }
+	public static void setBestcasePercentile(double bestcasePercentile) {
+		PortfolioSimulator.bestcasePercentile = bestcasePercentile;
+	}
 
-    public void setMeanReturn(double meanReturn) {
-        this.meanReturn = meanReturn;
-    }
+	public static double getWorstcasePercentile() {
+		return worstcasePercentile;
+	}
 
-    public double getRiskStdDev() {
-        return riskStdDev;
-    }
+	public static void setWorstcasePercentile(double worstcasePercentile) {
+		PortfolioSimulator.worstcasePercentile = worstcasePercentile;
+	}
 
-    public void setRiskStdDev(double riskStdDev) {
-        this.riskStdDev = riskStdDev;
-    }
-
+	/**
+     * 
+     * @return double[] Array of gaussian distributions for numYears given std dev and mean
+     */
     private double[] generateReturnsDistribution() {
         double returnsDistribution[] = new double[numYears];
         Random r = new Random();
-        for (int i = 1; i <= numYears; ++i) {
-            double sample = r.nextGaussian()*getRiskStdDev()+getMeanReturn();
-            returnsDistribution[i-1] = sample;
+        for (int i = 0; i < numYears; ++i) {
+            double sample = r.nextGaussian()*this.getPp().getRiskStdDev()+this.getPp().getMeanReturn();
+            returnsDistribution[i] = sample;
         }
         return returnsDistribution;
     }
     
+    /**
+     * @param capVal Initial capital value
+     * @param rate
+     * @return double final capital after applying the rate 
+     */
     private double adjustForRate(double capVal, double rate) {
-        return capVal*(1+(rate/100));
+    	return capVal*(1+(rate/100));
     }
     
+    /**
+     * 
+     * @param returnsSet contains gaussian distribution for numYears
+     * @return	double	Final capital value after applying gaussion distribution and inflation rate for numYears 
+     */
     private double computeFinalReturn(double returnsSet[]) {
         double finalReturn = getCapital();
         for(int i=0; i<returnsSet.length; i++) {
-            finalReturn = adjustForRate(finalReturn,returnsSet[i]); // Capital gain/return
+        	finalReturn = adjustForRate(finalReturn,returnsSet[i]); // Capital gain/return
             finalReturn = adjustForRate(finalReturn, getInflationRate()); // Adjust to inflation
         }
         return finalReturn;
     }
-    
+    /**
+     * Run simulation numSimulations of times. 
+     * And for each simulation calculate the returns distribution for numYears.
+     * And then apply the final distribution and inflation rate to get the final return at the end of each year  
+     */
     public void runSimulation() {
         double simulationResult[] = new double[numSimulations];
         for(int i=0; i<numSimulations; i++) {
@@ -142,20 +162,18 @@ public class PortfolioSimulator {
     
     public double getBestCase() {
         Arrays.sort(this.result);
-        double percentile = 0.9;
-        return getPercentileValue(percentile);
+        return getPercentileValue(PortfolioSimulator.getBestcasePercentile()/100.00);
     }
     
     public double getWorstCase() {
         Arrays.sort(this.result);
-        double percentile = 0.1;
-        return getPercentileValue(percentile);
+        return getPercentileValue(PortfolioSimulator.getWorstcasePercentile()/100.00);
     }
     
     public void printResults(String format){
     	DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.CEILING);        
-        System.out.format(format, this.getPortfolioType(), df.format(getMedian()),
+        System.out.format(format, this.getPp().getPt(), df.format(getMedian()),
                         df.format(getBestCase()), df.format(getWorstCase()));        
     }
 }

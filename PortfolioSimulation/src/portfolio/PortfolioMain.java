@@ -10,9 +10,10 @@ public class PortfolioMain {
         int numYears = 20;
         double inflationRate = 3.5;
         int numSimulations = 10000;
-        
-        PortfolioSimulator a = new PortfolioSimulator(PortfolioType.A, 9.4324, 15.675, capital, numYears, inflationRate, numSimulations);
-        PortfolioSimulator vc = new PortfolioSimulator(PortfolioType.I, 6.189, 6.3438, capital, numYears, inflationRate, numSimulations);
+        PortfolioProp aggrPp = new PortfolioProp(PortfolioType.A, 9.4324, 15.675);
+        PortfolioProp cnsrvPp = new PortfolioProp(PortfolioType.I, 6.189, 6.3438);
+        PortfolioSimulator a = new PortfolioSimulator(aggrPp, capital, numYears, inflationRate, numSimulations);
+        PortfolioSimulator vc = new PortfolioSimulator(cnsrvPp, capital, numYears, inflationRate, numSimulations);
         
         a.runSimulation();
         vc.runSimulation();
