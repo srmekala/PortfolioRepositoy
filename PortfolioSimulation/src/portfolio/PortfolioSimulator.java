@@ -189,15 +189,15 @@ public class PortfolioSimulator {
         double returnsDistribution[] = new double[numYears];
         Random r = new Random();
         for (int i = 0; i < numYears; ++i) {
-            double sample = ( r.nextGaussian() * this.getPp().getRiskStdDev() ) + 
-            				this.getPp().getMeanReturn();
+            double sample = ( r.nextGaussian() * this.getPp().getRiskStdDev() )
+            				+ this.getPp().getMeanReturn();
             returnsDistribution[i] = sample;
         }
         return returnsDistribution;
     }
     
     /**
-     * Adjusts given capital value for inflation rate. e.g. at rate of 3.5%, 
+     * Adjusts given capital value for rate(can be inflation rate/growth rate). e.g. at rate of 3.5%, 
      * a value of 100 is adjusted to 103.5 
      * @param capVal Initial capital value
      * @param rate rate of (inflation) in percentage
@@ -218,7 +218,7 @@ public class PortfolioSimulator {
     private double computeFinalReturn(double returnsSet[]) {
         double finalReturn = getCapital();
         for(int i=0; i<returnsSet.length; i++) {
-        	// Adjust for return percentage
+        	// Adjust for return growth percentage
         	finalReturn = adjustForRate(finalReturn,returnsSet[i]);
         	// Adjust for inflation rate
             finalReturn = adjustForRate(finalReturn, getInflationRate());
@@ -246,11 +246,13 @@ public class PortfolioSimulator {
         Arrays.sort(this.result);
         int len = this.result.length;
         int mid = len/2;
+        double median = 0.0;
         if(len % 2 == 1) {
-            return this.result[mid];
+            median = this.result[mid];
         } else {
-            return (this.result[mid] + this.result[(mid - 1)]) / 2;
+            median = (this.result[mid] + this.result[(mid - 1)]) / 2;
         }
+        return median;
     }
 
     /**
@@ -260,11 +262,15 @@ public class PortfolioSimulator {
      * @return percentile value from the result distribution
      */
     private double getPercentileValue(double percentile) {
-    	int pos = (int) Math.round((percentile / 100) * this.result.length);        
+    	int pos = (int) Math.round((percentile / 100) * this.result.length);
+    	double percentileVal = 0.0;
         if (pos == 0) {
-            return this.result[pos];
+        	percentileVal = this.result[pos];
+        } else {
+        	percentileVal = this.result[pos - 1];	
+             
         }
-        return this.result[pos - 1];	
+        return percentileVal;	
     }
     
     /**
@@ -295,6 +301,6 @@ public class PortfolioSimulator {
     	DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.CEILING);        
         System.out.format(format, this.getPp().getPt(), df.format(getMedian()),
-                        df.format(getBestCase()), df.format(getWorstCase()));        
+                          df.format(getBestCase()), df.format(getWorstCase()));        
     }
 }

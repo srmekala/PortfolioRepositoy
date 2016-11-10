@@ -28,10 +28,10 @@ public class PortfolioMain {
         // PortfolioProperty instance for 'Aggressive' type to be passed on to
         // PortfolioSimulator
         PortfolioProp aggrPp = new PortfolioProp(PortfolioType.A, meanReturnAggr,
-        	 									stdDeviationAggr);
+        	 									 stdDeviationAggr);
         // Portfolio for Aggressive type
         PortfolioSimulator a = new PortfolioSimulator(aggrPp, capital, numYears,
-        										inflationRate, numSimulations);
+        											  inflationRate, numSimulations);
         // Mean return for 'Very Conservative' portfolio type
         double meanReturnCons = 6.189;
         // Standard deviation for 'Very Conservative' portfolio type
@@ -39,10 +39,11 @@ public class PortfolioMain {
         // PortfolioProperty instance for 'Very Conservative' type to be passed on
         // to PortfolioSimulator
         PortfolioProp cnsrvPp = new PortfolioProp(PortfolioType.I, meanReturnCons,
-        										stdDeviationCons);
+        										  stdDeviationCons);
         // Portfolio for Very Conservative type
-        PortfolioSimulator vc = new PortfolioSimulator(cnsrvPp, capital,
-        							numYears, inflationRate, numSimulations);
+        PortfolioSimulator vc = new PortfolioSimulator(
+        								cnsrvPp, capital, numYears, inflationRate,
+        								numSimulations);
 
         // Run simulation on both
         a.runSimulation();
@@ -59,11 +60,11 @@ public class PortfolioMain {
         // ---------------------------------------------------------------------------
         String format = "|%1$-20s|%2$-20s|%3$-15s|%4$-15s|\n";
         System.out.println(
-        		"--------------------------------------------------------------------------");
+        			"--------------------------------------------------------------------------");
         System.out.format(format, "Portfolio Type", "Median 20th Year",
-        				"10% Best Case", "10% Worst Case");
+        				  "10% Best Case", "10% Worst Case");
         System.out.format(format, "--------------", "----------------",
-        				"-------------", "--------------");
+        				  "-------------", "--------------");
         a.printResults(format);
         vc.printResults(format);
         System.out.println(
